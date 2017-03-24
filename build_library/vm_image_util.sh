@@ -611,9 +611,11 @@ _write_cpio_disk() {
     local base_dir="${VM_TMP_ROOT}"
     local dst_dir=$(_dst_dir)
     local vmlinuz_name="$(_dst_name ".vmlinuz")"
+    local vmlinuz_d03_name="$(_dst_name ".vmlinuz_d03")"
     local grub_name="$(_dst_name "_grub.efi")"
     _write_cpio_common $@
     # Pull the kernel and loader out of the filesystem
+
     cp "${base_dir}"/boot/coreos/vmlinuz-a "${dst_dir}/${vmlinuz_name}"
 
     local grub_arch
@@ -624,6 +626,11 @@ _write_cpio_disk() {
 
     cp "${base_dir}/boot/coreos/grub/${grub_arch}/core.efi" "${dst_dir}/${grub_name}"
     VM_GENERATED_FILES+=( "${dst_dir}/${vmlinuz_name}" "${dst_dir}/${grub_name}" )
+
+    if [[ -f "${base_dir}"/boot/coreos/d03/vmlinuz-a ]]; then
+      cp "${base_dir}"/boot/coreos/d03/vmlinuz-a "${dst_dir}/${vmlinuz_d03_name}"
+      VM_GENERATED_FILES+=( "${dst_dir}/${vmlinuz_d03_name}" )
+    fi
 }
 
 _write_iso_disk() {

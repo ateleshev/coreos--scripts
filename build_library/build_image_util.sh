@@ -448,6 +448,13 @@ finish_image() {
   sudo cp "${root_fs_dir}/usr/boot/vmlinuz" \
        "${root_fs_dir}/boot/coreos/vmlinuz-a"
 
+  # copy custom kernels
+  if [[ -e "${root_fs_dir}/usr/boot/d03/vmlinuz" ]]; then
+       sudo mkdir -p "${root_fs_dir}/boot/coreos/d03"
+       sudo cp "${root_fs_dir}/usr/boot/d03/vmlinuz" \
+            "${root_fs_dir}/boot/coreos/d03/vmlinuz-a"
+  fi
+
   # Record directories installed to the state partition.
   # Explicitly ignore entries covered by existing configs.
   local tmp_ignore=$(awk '/^[dDfFL]/ {print "--ignore=" $2}' \
@@ -527,6 +534,13 @@ EOF
     cp --no-preserve=mode \
         "${root_fs_dir}/boot/coreos/vmlinuz-a" \
         "${BUILD_DIR}/${image_kernel}"
+  fi
+
+  if [[ -e "${root_fs_dir}/boot/coreos/d03/vmlinuz-a" && -n "${image_kernel}_d03" ]]; then
+    # copying kernel from vfat so ignore the permissions
+    cp --no-preserve=mode \
+        "${root_fs_dir}/boot/coreos/d03/vmlinuz-a" \
+        "${BUILD_DIR}/${image_kernel}_d03"
   fi
 
   if [[ -n "${pcr_policy}" ]]; then
